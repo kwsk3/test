@@ -1,0 +1,46 @@
+<project name="Sample.Project" default="runtests" basedir=".">
+    <property name="app.name"   value="sample" />
+    <property name="build.dir"  value="build/classes" />
+
+    <target name="JUNIT">
+        <available property="junit.present" classname="junit.framework.TestCase" />
+    </target>
+
+    <target name="compile" depends="JUNIT">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="src/main/" destdir="${build.dir}" >
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="build/lib"/>
+        <jar jarfile="build/lib/${app.name}.jar"
+             basedir="${build.dir}" includes="com/**"/>
+    </target>
+
+    <target name="compiletests" depends="jar">
+        <mkdir dir="build/testcases"/>
+        <javac srcdir="src/test" destdir="build/testcases">
+            <classpath>
+                <pathelement location="build/lib/${app.name}.jar" />
+                <pathelement path="" />
+            </classpath>
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <target name="runtests" depends="compiletests" if="junit.present">
+        <java fork="yes" classname="junit.textui.TestRunner" 
+            taskname="junit" failonerror="true">
+            <arg value="test.com.company.AllJUnitTests"/>
+            <classpath>
+                <pathelement location="build/lib/${app.name}.jar" />
+                <pathelement location="build/testcases" />
+                <pathelement path="" />
+                <pathelement path="${java.class.path}" />
+            </classpath>
+        </java>
+    </target>
+</project>
+
